@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <fcntl.h>
 
 typedef struct info
 {

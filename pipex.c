@@ -1,5 +1,4 @@
 #include "pipex.h"
-#include <fcntl.h>
 
 char	*find_path(char **envp)
 {
@@ -48,11 +47,12 @@ void	execu_second_cmd(t_data *data, char **envp)
 {
 	data->pathcmd1 = find_cmd_path(data, *data->cmd2);
 	if(data->pathcmd1 == NULL)
-		return ;
-
+	{
+		printf("SECOND COMMAND NOT FOUND");
+		exit(0);
+	}
 	dup2(data->fd[0], 0);
 	dup2(data->fd2, 1);
-	close(data->fd2);
 	close(data->fd[1]);
 	execve(data->pathcmd1, data->cmd2, envp);
 }
@@ -61,8 +61,10 @@ void	execu_fisrt_cmd(t_data *data, char **envp)
 {
 	data->pathcmd1 = find_cmd_path(data, *data->cmd1);
 	if(data->pathcmd1 == NULL)
-		return ;
-	
+	{
+		printf("FIRST COMMAND NOT FOUND");
+		exit(0);
+	}
 	dup2(data->fd1, 0);
 	dup2(data->fd[1], 1);
 	close(data->fd1);
@@ -74,7 +76,7 @@ char		execu(t_data *data, char **envp)
 	int child;
 
 	if(pipe(data->fd) == -1)
-		 return (printf("pipe error"));
+		 return (printf("PIPE ERROR"));
 	child = fork();
 	if(child == -1)
 		return (printf("FORK ERROR"));
@@ -121,13 +123,15 @@ int main(int ac, char **argv, char **envp)
             return (printf("error"));
 		if(!access(data.infile, R_OK))
 			data.fd1 = open(data.infile, O_RDWR);
+		else
+			return (printf("FILE1 DOESN'T EXIST"));
 		if(!access(data.outfile, W_OK))
-			data.fd2 = open(data.outfile, O_RDWR | O_CREAT | O_TRUNC, 0644);//!!!!
-		if(data.fd1 < 0 || data.fd2 < 0)
-			return (printf("FILE ERROR"));
+			data.fd2 = open(data.outfile, O_RDWR | O_CREAT | O_TRUNC, 0644);
+		else
+			return (printf("FILE2 DOESN'T EXIST"));
 		execu(&data, envp);
     }
     else
-        printf("error");
+        printf("ARGUMENTS AREN'T RIGHT");
     return (0);
 }
