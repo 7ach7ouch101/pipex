@@ -13,8 +13,8 @@ typedef struct info
     int fd[2];
     char *infile;
     char *outfile;
-    int infd;
-    int outfd;
+    int fd1;
+    int fd2;
     char **cmd1;
     char **cmd2;
     char *pathcmd1;

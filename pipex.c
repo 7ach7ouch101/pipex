@@ -1,4 +1,5 @@
 #include "pipex.h"
+#include <fcntl.h>
 
 char	*find_path(char **envp)
 {
@@ -27,7 +28,7 @@ char	*find_cmd_path(t_data *data, char *cmd)
 	char *tmp;
 	char *cmd_path;
 
-	i = 0;
+	i = 0;   
 	while (data->path[i])
 	{
 		tmp = ft_strjoin(data->path[i], "/");
@@ -48,12 +49,12 @@ void	execu_second_cmd(t_data *data, char **envp)
 	data->pathcmd1 = find_cmd_path(data, *data->cmd2);
 	if(data->pathcmd1 == NULL)
 		return ;
-	
-	
-	
-	
+
+	dup2(data->fd[0], 0);
+	dup2(data->fd2, 1);
+	close(data->fd2);
+	close(data->fd[1]);
 	execve(data->pathcmd1, data->cmd2, envp);
-	
 }
 
 void	execu_fisrt_cmd(t_data *data, char **envp)
@@ -62,9 +63,9 @@ void	execu_fisrt_cmd(t_data *data, char **envp)
 	if(data->pathcmd1 == NULL)
 		return ;
 	
-	
-	
-	
+	dup2(data->fd1, 0);
+	dup2(data->fd[1], 1);
+	close(data->fd1);
 	execve(data->pathcmd1, data->cmd1, envp);
 }
 
@@ -93,13 +94,13 @@ int parsedata(t_data *data, char **argv, char **envp)
 	char *tmp;
 	char *pathenv;
 
-    data->outfile = ft_strdup(argv[1]);
+    data->infile = ft_strdup(argv[1]);
 	tmp = ft_strdup(argv[2]);
 	data->cmd1 = ft_split(tmp, ' ');
 	free(tmp);
 	tmp = ft_strdup(argv[3]);
 	data->cmd2 = ft_split(tmp, ' ');
-	data->infile = ft_strdup(argv[4]);
+	data->outfile = ft_strdup(argv[4]);
 	free(tmp);
 	pathenv = find_path(envp);
 	if(pathenv == NULL)
@@ -109,6 +110,7 @@ int parsedata(t_data *data, char **argv, char **envp)
 	return (1);
 }
 
+
 int main(int ac, char **argv, char **envp)
 {
     t_data data;
@@ -117,6 +119,12 @@ int main(int ac, char **argv, char **envp)
     {
         if(!parsedata(&data, argv, envp))
             return (printf("error"));
+		if(!access(data.infile, R_OK))
+			data.fd1 = open(data.infile, O_RDWR);
+		if(!access(data.outfile, W_OK))
+			data.fd2 = open(data.outfile, O_RDWR | O_CREAT | O_TRUNC, 0644);//!!!!
+		if(data.fd1 < 0 || data.fd2 < 0)
+			return (printf("FILE ERROR"));
 		execu(&data, envp);
     }
     else
