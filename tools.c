@@ -1,24 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   tools.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mmeziani <mmeziani@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/12 12:07:34 by mmeziani          #+#    #+#             */
+/*   Updated: 2022/06/12 12:07:35 by mmeziani         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
-
-char	*ft_strdup(char *s1)
-{
-	int	a;
-	int	i;
-	char	*p;
-
-	i = 0;
-	a = strlen(s1);
-	p = malloc((a + 1) * sizeof(char));
-	if (!p)
-		return (NULL);
-	while (i <= a)
-	{
-		p[i] = s1[i];
-		i++;
-	}
-	p[i] = '\0';
-	return (p);
-}
 
 static int	words(const char *str, char c)
 {
@@ -51,6 +43,24 @@ void	*freee(char **p)
 	return (NULL);
 }
 
+void	*ft_memcpy(void	*dst, const void *src, size_t n)
+{
+	const char	*s;
+	char		*d;
+
+	d = dst;
+	s = src;
+	if (!src && !dst)
+		return (NULL);
+	while (n--)
+	{
+		*d = *s;
+		d++;
+		s++;
+	}
+	return (dst);
+}
+
 static	char	**fillarr(char **p, const char *s, char c)
 {
 	int	j;
@@ -67,7 +77,7 @@ static	char	**fillarr(char **p, const char *s, char c)
 			p[e] = (char *)malloc((j + 1) * sizeof(char));
 			if (!p)
 				return (freee(p));
-			memcpy(p[e], s, j);
+			ft_memcpy(p[e], s, j);
 			p[e][j] = '\0';
 			e++;
 			s = s + j;
@@ -91,53 +101,3 @@ char	**ft_split(const char *s, char c)
 	p = fillarr(p, s, c);
 	return (p);
 }
-
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
-{
-	size_t	i;
-
-	i = 0;
-	if (n == 0)
-		return (0);
-	while ((s1[i] == s2[i] && i < (n - 1)) && (s1[i] != '\0' && s2[i] != '\0'))
-		i++;
-	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
-}
-static	char	*merge(char const *s1, char const *s2, char *p)
-{
-	int	i;
-	int	j;
-
-	i = 0;
-	j = 0;
-	while (s1[i])
-	{
-		p[i] = s1[i];
-		i++;
-	}
-	while (s2[j])
-	{
-		p[i] = s2[j];
-		i++;
-		j++;
-	}
-	p[i] = '\0';
-	return (p);
-}
-
-char	*ft_strjoin(char *s1, char *s2)
-{
-	char	*p;
-	int		a;
-	int		b;
-
-	if (!s1 || !s2)
-		return (NULL);
-	a = strlen(s1);
-	b = strlen(s2);
-	p = malloc((a + b) + 1);
-	if (!p)
-		return (NULL);
-	p = merge(s1, s2, p);
-	return (p);
-}	
