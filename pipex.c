@@ -6,7 +6,7 @@
 /*   By: mmeziani <mmeziani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 12:07:23 by mmeziani          #+#    #+#             */
-/*   Updated: 2022/06/12 12:25:26 by mmeziani         ###   ########.fr       */
+/*   Updated: 2022/06/18 22:38:39 by mmeziani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ void	execu_second_cmd(t_data *data, char **envp)
 	dup2(data->fd[0], 0);
 	dup2(data->fd2, 1);
 	close(data->fd[1]);
+	close(data->fd2);
 	if (execve(data->pathcmd1, data->cmd2, envp) == -1)
 	{
 		write(2, "EXECVE ERROR", 12);
@@ -41,6 +42,7 @@ void	execu_fisrt_cmd(t_data *data, char **envp)
 	dup2(data->fd1, 0);
 	dup2(data->fd[1], 1);
 	close(data->fd1);
+	close(data->fd[0]);
 	if (execve(data->pathcmd1, data->cmd1, envp) == -1)
 	{
 		write(2, "EXECVE ERROR", 12);
@@ -61,8 +63,8 @@ char	execu(t_data *data, char **envp)
 		execu_fisrt_cmd(data, envp);
 	else
 	{
-		waitpid(child, NULL, 0);
-		execu_second_cmd(data, envp);
+		if (waitpid(child, NULL, 0) == child)
+			execu_second_cmd(data, envp);
 	}
 	return (write(1, "OK", 2));
 }
@@ -98,9 +100,9 @@ int	main(int ac, char **argv, char **envp)
 	{
 		parsedata(&data, argv, envp);
 		data.fd1 = open(data.infile, O_RDWR);
-		if(data.fd1 < 0)
+		if (data.fd1 < 0)
 			return (write(1, "FILE1 DOESN'T EXIST", 19));
-		data.fd2 = open(data.outfile, O_RDWR | O_CREAT | O_TRUNC, 0645);
+		data.fd2 = open(data.outfile, O_RDWR | O_CREAT | O_TRUNC, 0644);
 		if (data.fd2 < 0)
 			return (write(1, "FILE2 DOESN'T EXIST", 19));
 		execu(&data, envp);

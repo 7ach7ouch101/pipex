@@ -6,7 +6,7 @@
 /*   By: mmeziani <mmeziani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 12:07:29 by mmeziani          #+#    #+#             */
-/*   Updated: 2022/06/12 12:07:30 by mmeziani         ###   ########.fr       */
+/*   Updated: 2022/06/18 22:38:22 by mmeziani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ char	*find_cmd_path(t_data *data, char *cmd)
 	int		i;
 
 	i = 0;
+	if (!access(cmd, X_OK))
+		return (cmd);
 	while (data->path[i])
 	{
 		tmp = ft_strjoin(data->path[i], "/");

@@ -1,20 +1,17 @@
 NAME = pipex
-
-CFLAGS = -Wall -Wextra -Werror -c -g
-
-RM = rm -f
+CC = gcc
+CFLAGS = -Wall -Wextra -Werror
+INC = pipex.h
+RM = rm -rf
 
 SRCS = pipex.c tools.c tools2.c find_path.c
 
 OBJS = $(SRCS:.c=.o)
 
-C_OBJS = $(C_SRCS:.c=.o)
-
 all: $(NAME)
 
-$(NAME): $(OBJS) pipex.h
-	cc $(CFLAGS) $(SRCS)
-	cc $(OBJS) -o $(NAME)
+$(NAME): $(OBJS) $(INC)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
 clean:
 	$(RM) $(OBJS)
